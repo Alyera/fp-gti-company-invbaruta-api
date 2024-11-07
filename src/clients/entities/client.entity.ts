@@ -7,6 +7,8 @@ import { Proforma } from 'src/proformas/entities/proforma.entity';
 
 @ObjectType()
 export class Client {
+  @Field(() => Int)
+  proformasCount: number;
   @Field()
   CUSTNMBR: string;
   @Field()

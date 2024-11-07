@@ -53,4 +53,9 @@ export class ClientsResolver {
   clientProformasFluent(@Args('CUSTNMBR', { type: () => String}) CUSTNMBR: string) {
     return this.clientsService.clientProformasFluent(CUSTNMBR);
   }
+
+  @Query((returns) => Client, { name: 'countProformasByRIF', nullable: true })
+  countProformasByRIF(@Args('CUSTNMBR', { type: () => String}) CUSTNMBR: string) {
+    return this.clientsService.countProformasByRIF(CUSTNMBR);
+  }
 }

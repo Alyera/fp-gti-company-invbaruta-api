@@ -838,6 +838,7 @@ type ClientsEmail {
 }
 
 type Client {
+  proformasCount: Int!
   CUSTNMBR: String!
   CUSTNAME: String!
   CUSTCLAS: String!
@@ -975,6 +976,7 @@ type Query {
   clientProformasByRIF(CUSTNMBR: String!, PAGE: Int!): Client
   clientInvoicesByRIF(CUSTNMBR: String!): Client
   clientProformasFluent(CUSTNMBR: String!): [Client!]
+  countProformasByRIF(CUSTNMBR: String!): Client
   clientsEmails: [ClientsEmail!]!
   clientsEmail(id: Int!): ClientsEmail!
   clientsAccounts: [ClientsAccount!]!

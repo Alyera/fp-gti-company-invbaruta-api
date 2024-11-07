@@ -80,8 +80,8 @@ export class ClientsService {
         CUSTNMBR:true,
         proformas: {
           orderBy: [
-            { DOCDATE: 'desc' },
-            { SOPNUMBE: 'desc' }
+            { DOCDATE: 'asc' },
+            { SOPNUMBE: 'asc' }
           ],
           skip: ( page - 1) * 100,
           take: 100,
@@ -141,7 +141,39 @@ export class ClientsService {
     
   }
 
+  async countProformasByRIF(CUSTNMBR: string) {
+    const client = await this.prisma.client.findUnique({
+      where: { CUSTNMBR },
+      select: {
+        CUSTNMBR: true,
+        proformas: {
+          select: {
+            SOPNUMBE: true, 
+          },
+          where: {
+            CUSTNMBR: CUSTNMBR,
+            SOPTYPE: 2,
+            VOIDSTTS:0,
+            khistory: {
+              every: {
+                NOT: {
+                  DELETE1: 0,
+                  SOPTYPE:2,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   
+    if (!client) return null;
+    //console.log(client.proformas.length)
+    return {
+      CUSTNMBR: client.CUSTNMBR,
+      proformasCount: client.proformas.length,
+    };
+  }
 
   clientProformasFluent(CUSTNMBR: string) {
     return this.prisma.client.findUnique({
@@ -153,5 +185,4 @@ export class ClientsService {
       }
     })
   }
-  
 }
