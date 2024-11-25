@@ -70,76 +70,125 @@ export class ClientsService {
     });
   }
 
-  clientProformasByRIF(CUSTNMBR: string, PAGE:number) {
-    const page=PAGE;
-    // Example: 52
+  async clientProformasByRIF(CUSTNMBR: string, PAGE: number, FILTERYEAR?: number, FILTERMONTH?: number) {
+    const page = PAGE;
+  
+    const adjustedMonth = 
+    FILTERMONTH && FILTERMONTH >= 1 && FILTERMONTH <= 12 ? FILTERMONTH - 1 : undefined;
+  
+    const dateStart = FILTERYEAR
+      ? adjustedMonth !== undefined
+        ? new Date(FILTERYEAR, adjustedMonth-1, 1) 
+        : new Date(FILTERYEAR, 0-1, 1) 
+      : undefined;
+  
+    const dateEnd = FILTERYEAR
+      ? adjustedMonth !== undefined
+        ? new Date(FILTERYEAR, adjustedMonth + 1, 1) 
+        : new Date(FILTERYEAR, 11, 1) 
+      : undefined;
+  
     return this.prisma.client.findUnique({
-      where: { CUSTNMBR},
-      
+      where: { CUSTNMBR },
       select: {
-        CUSTNMBR:true,
+        CUSTNMBR: true,
         proformas: {
           orderBy: [
             { DOCDATE: 'asc' },
-            { SOPNUMBE: 'asc' }
+            { SOPNUMBE: 'asc' },
           ],
-          skip: ( page - 1) * 100,
+          skip: (page - 1) * 100,
           take: 100,
-          select:{
-            SOPNUMBE:true,
-            PRSTADCD:true,
-            SUBTOTAL:true,
-            ORSUBTOT:true,
-            TAXAMNT:true,
-            ORTAXAMT:true,
-            DOCAMNT:true,
-            ORDOCAMT:true,
-            DOCDATE:true,
-            CURNCYID:true,
-            CREATDDT:true,
-            sales_taxes_work_history:{
-              select:{
-                TXDTLPCTAMT:true,
+          select: {
+            SOPNUMBE: true,
+            PRSTADCD: true,
+            SUBTOTAL: true,
+            ORSUBTOT: true,
+            TAXAMNT: true,
+            ORTAXAMT: true,
+            DOCAMNT: true,
+            ORDOCAMT: true,
+            DOCDATE: true,
+            CURNCYID: true,
+            CREATDDT: true,
+            sales_taxes_work_history: {
+              select: {
+                TXDTLPCTAMT: true,
               },
-              where:{
-                LNITMSEQ:0
-              }
-            },
-            work_history:{
-              select:{
-                USRDAT02:true,
-                COMMENT_1:true,
-                USRDEF03:true
+              where: {
+                LNITMSEQ: 0,
               },
-              where:{
-                SOPTYPE:2
-              }
             },
-            khistory:{
-              where:{
-                SOPTYPE:2,
-                DELETE1:0,
-              }
-            }
+            work_history: {
+              select: {
+                USRDAT02: true,
+                COMMENT_1: true,
+                USRDEF03: true,
+              },
+              where: {
+                SOPTYPE: 2,
+                ...(dateStart && dateEnd
+                  ? {
+                      USRDAT02: {
+                        gte: dateStart,
+                        lt: dateEnd,
+                      },
+                    }
+                  : {}),
+              },
+            },
+            khistory: {
+              where: {
+                SOPTYPE: 2,
+                DELETE1: 0,
+              },
+            },
+            detail: {
+              where: {
+                SOPTYPE: 2,
+              },
+            },
           },
           where: {
-            CUSTNMBR: CUSTNMBR,
+            CUSTNMBR,
             SOPTYPE: 2,
-            VOIDSTTS:0,
+            VOIDSTTS: 0,
+            ...(dateStart && dateEnd
+              ? {
+                  OR: [
+                    {
+                      DOCDATE: {
+                        gte: dateStart,
+                        lt: dateEnd,
+                      },
+                    },
+                    {
+                      work_history: {
+                        some: {
+                          USRDAT02: {
+                            gte: dateStart,
+                            lt: dateEnd,
+                          },
+                        },
+                      },
+                    },
+                  ],
+                }
+              : {}),
             khistory: {
               every: {
                 NOT: {
                   DELETE1: 0,
-                  SOPTYPE:2,
+                  SOPTYPE: 2,
                 },
               },
             },
           },
         },
       },
-    })
-    
+    });
   }
+
 
   async countProformasByRIF(CUSTNMBR: string) {
     const client = await this.prisma.client.findUnique({

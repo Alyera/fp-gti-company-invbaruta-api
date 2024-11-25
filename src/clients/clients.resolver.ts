@@ -30,8 +30,8 @@ export class ClientsResolver {
   }
 
   @Query((returns) => Client, { name: 'clientProformasByRIF', nullable: true })
-  clientProformasByRIF(@Args('CUSTNMBR', { type: () => String}) CUSTNMBR: string, @Args('PAGE', { type: () => Int}) PAGE: number) {
-    return this.clientsService.clientProformasByRIF(CUSTNMBR,PAGE);
+  clientProformasByRIF(@Args('CUSTNMBR', { type: () => String}) CUSTNMBR: string, @Args('PAGE', { type: () => Int}) PAGE: number, @Args('FILTERYEAR', { type: () => Int}) FILTERYEAR:number, @Args('FILTERMONTH', { type: () => Int}) FILTERMONTH:number) {
+    return this.clientsService.clientProformasByRIF(CUSTNMBR,PAGE,FILTERYEAR, FILTERMONTH);
   }
 
   @Query((returns) => Client, { name: 'clientInvoicesByRIF', nullable: true })
