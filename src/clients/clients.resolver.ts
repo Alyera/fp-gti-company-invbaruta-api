@@ -15,8 +15,13 @@ export class ClientsResolver {
   }
 
   @Query(() => [Client], { name: 'clients' })
-  findAll() {
-    return this.clientsService.findAll();
+  findAll(@Args('PAGE', { type: () => Int}) PAGE: number) {
+    return this.clientsService.findAll(PAGE);
+  }
+
+  @Query(() => [Client], { name: 'clientsbyrif' })
+  findAllByRif(@Args('CUSTNMBR', { type: () => String}) CUSTNMBR: string) {
+    return this.clientsService.findAllByRif(CUSTNMBR);
   }
 
   @Query(() => Client, { name: 'client' })

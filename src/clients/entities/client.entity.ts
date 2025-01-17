@@ -226,8 +226,8 @@ export class Client {
   @Field((type) => [ClientsAccount], { nullable: true })
   accounts?: [ClientsAccount] | null;
 
-  @Field((type) => ClientsEmail, { nullable: true })
-  email : ClientsEmail | null
+  @Field((type) => [ClientsEmail], { nullable: true })
+  email?: ClientsEmail[] | null;
 
   @Field((type) =>  [Proforma], { nullable: true })
   proformas?: Proforma[] | null

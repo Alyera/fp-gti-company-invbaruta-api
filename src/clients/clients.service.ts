@@ -17,8 +17,23 @@ export class ClientsService {
     return 'This action adds a new client';
   }
 
-  findAll() {
-    return this.prisma.client.findMany();
+  findAll(PAGE: number) {
+    const page = PAGE;
+    return this.prisma.client.findMany({
+      skip: (page - 1) * 100,
+      take: 100,
+      select: {
+        CUSTNMBR: true,
+        CUSTNAME: true,
+        PHONE1: true,
+        STATE: true,
+        email:{
+          select:{
+            Email_Recipient: true
+          }
+        } 
+      },
+    });
   }
 
   findOne(CUSTNMBR: string) {
@@ -233,5 +248,22 @@ export class ClientsService {
         CUSTNMBR:true
       }
     })
+  }
+
+  findAllByRif(CUSTNMBR: string) {
+    return this.prisma.client.findMany({
+      where: { CUSTNMBR },
+      select: {
+        CUSTNMBR: true,
+        CUSTNAME: true,
+        PHONE1: true,
+        STATE: true,
+        email:{
+          select:{
+            Email_Recipient: true
+          }
+        } 
+      },
+    });
   }
 }

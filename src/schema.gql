@@ -945,7 +945,7 @@ type Client {
   SOPNUMBE: String!
   PAGE: Int!
   accounts: [ClientsAccount!]
-  email: ClientsEmail
+  email: [ClientsEmail!]
   proformas: [Proforma!]
   invoices: [Invoice!]
 }
@@ -970,7 +970,8 @@ type TasasCambio {
 }
 
 type Query {
-  clients: [Client!]!
+  clients(PAGE: Int!): [Client!]!
+  clientsbyrif(CUSTNMBR: String!): [Client!]!
   client(id: String!): Client!
   clientAccountsByRIF(CUSTNMBR: String!): Client
   clientProformasByRIF(CUSTNMBR: String!, PAGE: Int!, FILTERYEAR: Int!, FILTERMONTH: Int!): Client
